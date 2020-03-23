@@ -37,46 +37,35 @@ def move(hwnd, direction, speed, delay_time):  # TODO
     print(win32api.SendMessage(hwnd, win32con.WM_MOUSEMOVE, win32con.MK_LBUTTON, _get_pos_bin(50, 20)))
 
 
-def smooth_move(distance, degrees, used_time=5, step=2):
-    mouse_pos_tmp = list(win32api.GetCursorPos())
-    mouse_pos_tmp1 = [0, 0]
-    mouse_pos_tmp2 = [0, 0]
-    times = int((distance*2)/step)*4
-    time_each_turn = used_time / times
-    x_weight = int(step * math.sin(degrees))
-    y_weight = int(step * math.cos(degrees))
-    mouse_pos_tmp1[0] = mouse_pos_tmp[0] + x_weight
-    mouse_pos_tmp1[1] = mouse_pos_tmp[1] + y_weight
-    mouse_pos_tmp2[0] = mouse_pos_tmp[0] - x_weight
-    mouse_pos_tmp2[1] = mouse_pos_tmp[1] - y_weight
-    sign, count = 0, 0
-    print(times) ###
-    c = 0 ###
-    a = time.time() ###
-    for _ in range(times):
-        if sign == 0:
+def smooth_move(distance, degree, time_usage=5, step=4):
+    mousepos = list(win32api.GetCursorPos())
+    deta_X = int(step * math.sin(math.radians(degree)))
+    deta_Y = int(step * math.cos(math.radians(degree)))
+    repeat_times = int((distance*2) / step) + 1 if int((distance*2) / step) % 2 else int((distance*2) / step)
+    time_each_repetition = time_usage / repeat_times
+    mouse_pos_one = [mousepos[0] + deta_X, mousepos[1] + deta_Y]
+    mouse_pos_two = [mousepos[0] - deta_X, mousepos[1] - deta_Y]
+    count, sign = repeat_times, 1
+    correct = 0.001
+    while count:
+        if sign:
             start = time.time()
-            count += 1
-            print(mouse_pos_tmp1)  ###
-            win32api.SetCursorPos(mouse_pos_tmp1)
-            c += 1 ###
-            if count == int(times / 4):
-                sign, count = 1, 0
+            win32api.SetCursorPos(mouse_pos_one)
+            count -= 1
+            if count == int((repeat_times / 4)*3):
+                sign = 0
             end = time.time()
-            time.sleep(time_each_turn - end + start-0.001)
+            time_use = end - start
+            time.sleep(time_each_repetition -time_use - correct)
         else:
             start = time.time()
-            count += 1
-            print(mouse_pos_tmp2)
-            win32api.SetCursorPos(mouse_pos_tmp2)
-            c += 1 ###
-            if count == int(times / 2):
-                sign, count = 0, 0
+            win32api.SetCursorPos(mouse_pos_two)
+            count -= 1
+            if count == int(repeat_times / 4):
+                sign = 1
             end = time.time()
-            time.sleep(time_each_turn - end + start-0.001)
-    print(c) ###
-    b = time.time() ###
-    print(b - a) ###
+            time_use = end - start
+            time.sleep(time_each_repetition - time_use - correct)
 
 
 def press(hwnd, button, during_time, delay_time):

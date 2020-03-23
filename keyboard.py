@@ -1,7 +1,5 @@
 import win32api
 import win32con
-import win32gui
-import os
 
 
 def _get_lparam(wparam, isKeyUp=True):
@@ -19,7 +17,7 @@ def input(hwnd, keys):
         # 得到 lparam
         lparam = _get_lparam(wparam, False)
         # PostMessage
-        win32gui.PostMessage(hwnd, win32con.WM_KEYDOWN, wparam, lparam)
+        win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, wparam, lparam)
 
 
 def enter(hwnd):
@@ -28,4 +26,4 @@ def enter(hwnd):
     # 得到 lparam
     lparam = _get_lparam(wparam, False)
     # PostMessage
-    win32gui.PostMessage(hwnd, win32con.WM_KEYDOWN, wparam, lparam)
+    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, wparam, lparam)

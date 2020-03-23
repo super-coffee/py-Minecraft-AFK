@@ -6,6 +6,7 @@ import os
 import time
 import keyboard
 import mouse
+from tqdm import tqdm
 
 
 class AFK():
@@ -20,6 +21,7 @@ class AFK():
     ]
 
     def __init__(self):
+        os.system('title py-Minecraft-AFK')
         self.main()
     
     def get_lparam(self, wparam, isKeyUp=True):
@@ -52,20 +54,39 @@ class AFK():
             item = self.hwnds_list_of_taegets[hwnd_index_id]
             print('[{index}] {title}, {hwnd}'.format(index=hwnd_index_id, title=item['title'], hwnd=item['hwnd']))
 
-    def ops(self, user_type, hwnd):
-        splited = user_type.split('.')
-        hardware = splited[0]
-        operation = splited[1]
+    def do(self, callback, loop_time, args):
+        has_key_down_0 = -0b1000000000000000
+        has_key_down_1 = -0b111111111111111
+        key_down = 0b1
+
+        print('>>> 在此窗口按下 ctrl+c 终止运行 <<<')
+        print('>>> 在任何地方按下 右alt键 开始操作 <<<')
+        while True:
+            rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
+            if rmenu_status == has_key_down_0 or rmenu_status == has_key_down_1 or rmenu_status == key_down:
+                for _ in tqdm(range(loop_time), ascii=True):  # ascii=True 可防止多行进度条
+                    callback(*args)
+                input('>>> 按下回车退出 <<<')
+                break
+
+    def ops(self, user_op_type, hwnd):
+        op_levels = user_op_type.split('.')  # 把硬件类型和操作分开放入列表
+        hardware = op_levels[0]  # 硬件类型  e.g. mouse
+        operation = op_levels[1]  # 操作  e.g. right
+
+        loop_time = int(input('循环次数 >>>'))
         if hardware == 'mouse' and not operation == 'move':
             during_time = float(input('按下持续时间（点击可设为 0） >>>'))
             delay_time = float(input('抬起持续时间 >>>'))
-            mouse.press(hwnd, operation, during_time, delay_time)
+            self.do(mouse.press, loop_time, (hwnd, operation, during_time, delay_time))
+        elif operation == 'move':  # 无需再次判断是否为鼠标
+            print('全是 bug')
         elif hardware == 'keyboard':  # 键盘需要提前判断
             if operation == 'input':
                 keys = input('请输入你的按键 >>>')
-                keyboard.input(hwnd, keys)
+                self.do(keyboard.input, loop_time, (hwnd, keys))
             elif operation == 'enter':
-                keyboard.enter(hwnd)
+                self.do(keyboard.enter, loop_time, (hwnd))
 
     def main(self):
         win32gui.EnumWindows(self.get_hwnd_with_keyword, None)  # 枚举屏幕上所有的顶级窗口，第一个参数为 callback，第二个没啥用。得到关键字窗口
@@ -100,3 +121,5 @@ class AFK():
 
 if __name__ == '__main__':
     AFK()
+    import threading
+    threading.Thread()

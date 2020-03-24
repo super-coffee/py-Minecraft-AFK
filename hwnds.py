@@ -22,3 +22,5 @@ hwnds_count = len(hwnds_list_of_taegets)
 for hwnd_index_id in range(hwnds_count):  # 通过序列索引迭代
     item = hwnds_list_of_taegets[hwnd_index_id]
     print('[{hwnd}] {title}'.format(title=item['title'], hwnd=item['hwnd']))
+
+input()

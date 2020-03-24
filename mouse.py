@@ -37,7 +37,7 @@ def move(hwnd, direction, speed, delay_time):  # TODO
     print(win32api.SendMessage(hwnd, win32con.WM_MOUSEMOVE, win32con.MK_LBUTTON, _get_pos_bin(50, 20)))
 
 
-def moving_mouse(distance, degree, time_usage=5, step=4):
+def moving(distance, degree, time_usage=5, step=4):
     mousepos = list(win32api.GetCursorPos())  # 获得mc的基准光标
     deta_X = int(step * math.sin(math.radians(degree)))
     deta_Y = int(step * math.cos(math.radians(degree)))
@@ -82,5 +82,4 @@ def press(hwnd, button, during_time, delay_time):
 
 if __name__ == '__main__':  # DEBUG
     time.sleep(5)
-    # move(197668, 0, 0, 0)
-    smooth_move(100, 700)
+    moving(100, 700)

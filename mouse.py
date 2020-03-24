@@ -1,8 +1,9 @@
+import math
+import time
+
 import win32api
 import win32con
 import win32gui
-import time
-import math
 
 
 def _get_client_center_pos(hwnd):
@@ -23,7 +24,7 @@ def left(hwnd, during_time, delay_time, pos):
     time.sleep(delay_time)
 
 
-def right(hwnd, during_time, delay_time, pos):   
+def right(hwnd, during_time, delay_time, pos):
     win32api.PostMessage(hwnd, win32con.WM_RBUTTONDOWN, 0, pos)
     time.sleep(during_time)
     win32api.PostMessage(hwnd, win32con.WM_RBUTTONUP, 0, pos)
@@ -33,8 +34,10 @@ def right(hwnd, during_time, delay_time, pos):
 def move(hwnd, direction, speed, delay_time):  # TODO
     # win32api.PostMessage(hwnd, win32con.WM_MOUSEMOVE, 0, _get_pos_bin(1366, 768))
     print(bin(_get_pos_bin(20, 20)))
-    print(win32api.SendMessage(hwnd, win32con.WM_MOUSEMOVE, win32con.MK_LBUTTON, _get_pos_bin(20, 20)))
-    print(win32api.SendMessage(hwnd, win32con.WM_MOUSEMOVE, win32con.MK_LBUTTON, _get_pos_bin(50, 20)))
+    print(win32api.SendMessage(hwnd, win32con.WM_MOUSEMOVE,
+                               win32con.MK_LBUTTON, _get_pos_bin(20, 20)))
+    print(win32api.SendMessage(hwnd, win32con.WM_MOUSEMOVE,
+                               win32con.MK_LBUTTON, _get_pos_bin(50, 20)))
 
 
 def moving(distance, degree, time_usage=5, step=4):
@@ -82,4 +85,4 @@ def press(hwnd, button, during_time, delay_time):
 
 if __name__ == '__main__':  # DEBUG
     time.sleep(5)
-    moving(100, 700)
+    moving(500, 90, 5, 4)

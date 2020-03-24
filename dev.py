@@ -1,12 +1,16 @@
 # coding: UTF-8
+# https://github.com/jinzhijie/py-Minecraft-AFK
+import os
+import time
+
 import win32api
 import win32con
 import win32gui
-import os
-import time
+from tqdm import tqdm
+from progress.spinner import Spinner
+
 import keyboard
 import mouse
-from tqdm import tqdm
 
 
 class AFK():
@@ -15,7 +19,7 @@ class AFK():
     operation_list = [
         {'type': 'mouse.left', 'description': '鼠标左键'},
         {'type': 'mouse.right', 'description': '鼠标右键'},
-        {'type': 'mouse.move', 'description': '鼠标移动'},  # TODO
+        {'type': 'mouse.move', 'description': '鼠标移动（测试）'},
         {'type': 'keyboard.input', 'description': '键盘按键'},
         {'type': 'keyboard.enter', 'description': '键盘回车'}
     ]
@@ -62,25 +66,35 @@ class AFK():
         print('>>> 在此窗口按下 ctrl+c 终止运行 <<<')
         print('>>> 在任何地方按下 右alt键 开始操作 <<<')
         while True:
+            time.sleep(0.001)  # 不设延时吃 CPU
             rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
             if rmenu_status == has_key_down_0 or rmenu_status == has_key_down_1 or rmenu_status == key_down:
-                for _ in tqdm(range(loop_time), ascii=True):  # ascii=True 可防止多行进度条
-                    callback(*args)
-                input('>>> 按下回车退出 <<<')
-                break
+                if not loop_time == 0:
+                    for _ in tqdm(range(loop_time), ascii=True):  # ascii=True 可防止多行进度条，loop_time 太大直接就炸
+                        callback(*args)
+                    input('>>> 按下回车退出 <<<')
+                    break
+                else:  # 无限循环
+                    spinner = Spinner('正在执行     ')
+                    while True:
+                        spinner.next()
+                        callback(*args)
 
     def ops(self, user_op_type, hwnd):
         op_levels = user_op_type.split('.')  # 把硬件类型和操作分开放入列表
         hardware = op_levels[0]  # 硬件类型  e.g. mouse
         operation = op_levels[1]  # 操作  e.g. right
 
-        loop_time = int(input('循环次数 >>>'))
+        loop_time = int(input('循环次数，0 为无限循环 >>>'))
         if hardware == 'mouse' and not operation == 'move':
-            during_time = float(input('按下持续时间（点击可设为 0） >>>'))
+            during_time = float(input('按下持续时间 >>>'))
             delay_time = float(input('抬起持续时间 >>>'))
             self.do(mouse.press, loop_time, (hwnd, operation, during_time, delay_time))
         elif operation == 'move':  # 无需再次判断是否为鼠标
-            print('全是 bug')
+            print('全是 bug，仅供测试！')
+            distance = int(input('distance >>>'))
+            degree = int(input('degree >>>'))
+            mouse.moving(distance, degree, 5, 4)
         elif hardware == 'keyboard':  # 键盘需要提前判断
             if operation == 'input':
                 keys = input('请输入你的按键 >>>')

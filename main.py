@@ -100,7 +100,7 @@ class AFK():
                 keys = input('请输入你的按键 >>>')
                 self.do(keyboard.input, loop_time, (hwnd, keys))
             elif operation == 'enter':
-                self.do(keyboard.enter, loop_time, (hwnd))
+                self.do(keyboard.enter, loop_time, (hwnd, ))
 
     def main(self):
         win32gui.EnumWindows(self.get_hwnd_with_keyword, None)  # 枚举屏幕上所有的顶级窗口，第一个参数为 callback，第二个没啥用。得到关键字窗口

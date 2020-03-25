@@ -1,3 +1,4 @@
+import time
 import win32api
 import win32con
 
@@ -10,14 +11,35 @@ def _get_lparam(wparam, isKeyUp=True):
     return repeatCount | (scanCode << 16) | (0 << 24) | (prevKeyState << 30) | (transitionState << 31)
 
 
-def input(hwnd, keys):
-    for key in keys:
+class KeyOperate:
+    hwnd = None
+    keys = None
+
+    def __init__(self, hwnd, keys):
+        self.hwnd = hwnd
+        self.keys = keys
+
+    def keydown(self):
+        for key in self.keys:
+            # 得到 wparam
+            VkKeyCode = win32api.VkKeyScan(key)
+            # 得到 lparam
+            lparamDown = _get_lparam(VkKeyCode, False)
+            # PostMessage
+            win32api.PostMessage(self.hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamDown)
+            time.sleep(0.0001)
+
+    def keyup(self):
+        for key in self.keys:
         # 得到 wparam
-        wparam = win32api.VkKeyScan(key)
-        # 得到 lparam
-        lparam = _get_lparam(wparam, False)
-        # PostMessage
-        win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, wparam, lparam)
+            VkKeyCode = win32api.VkKeyScan(key)
+            # 得到 lparam
+            lparamUp = _get_lparam(VkKeyCode, True)
+            # PostMessage
+            win32api.PostMessage(self.hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamUp)
+            time.sleep(0.0001)
+
+
 
 
 def enter(hwnd):

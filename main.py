@@ -58,6 +58,30 @@ class AFK():
             item = self.hwnds_list_of_taegets[hwnd_index_id]
             print('[{index}] {title}, {hwnd}'.format(index=hwnd_index_id, title=item['title'], hwnd=item['hwnd']))
 
+    def do_Keyboard(self, callback, args):
+        has_key_down_0 = -0b1000000000000000
+        has_key_down_1 = -0b111111111111111
+        key_down = 0b1
+        run_state = 1
+
+        print('>>> 在此窗口按下 ctrl+c 终止运行 <<<')
+        print('>>> 在此窗口按下右ctrl暂停运行 <<<')
+        print('>>> 在任何地方按下 右alt键 开始操作 <<<')
+        while True:
+            time.sleep(0.001)  # 不设延时吃 CPU
+            rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
+            if rmenu_status == has_key_down_0 or rmenu_status == has_key_down_1 or rmenu_status == key_down:
+                while True:
+                    rctrl_status = win32api.GetAsyncKeyState(win32con.VK_RCONTROL)
+                    if run_state:
+                        callback(*args).keydown()
+                        run_state = 0 if rctrl_status == has_key_down_0 else 1
+                    else:
+                        callback(*args).keyup()
+                        print("暂停操作")
+                        run_state = 1
+                        break
+
     def do(self, callback, loop_time, args):
         has_key_down_0 = -0b1000000000000000
         has_key_down_1 = -0b111111111111111
@@ -98,7 +122,7 @@ class AFK():
         elif hardware == 'keyboard':  # 键盘需要提前判断
             if operation == 'input':
                 keys = input('请输入你的按键 >>>')
-                self.do(keyboard.input, loop_time, (hwnd, keys))
+                self.do_Keyboard(keyboard.KeyOperate, (hwnd, keys))
             elif operation == 'enter':
                 self.do(keyboard.enter, loop_time, (hwnd, ))
 

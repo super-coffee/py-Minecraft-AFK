@@ -27,13 +27,6 @@ class AFK():
     def __init__(self):
         os.system('title py-Minecraft-AFK')
         self.main()
-    
-    def get_lparam(self, wparam, isKeyUp=True):
-        scanCode = win32api.MapVirtualKey(wparam, 0)
-        repeatCount = 1 if isKeyUp else 0
-        prevKeyState = 1 if isKeyUp else 0
-        transitionState = 1 if isKeyUp else 0
-        return repeatCount | (scanCode << 16) | (0 << 24) | (prevKeyState << 30) | (transitionState << 31)
 
     def get_hwnd_with_keyword(self, hwnd, unused):
         # 是现有窗口 & 启用了窗口 & 窗口具有WS_VISIBLE样式（非隐藏） & 窗口标题包含关键字

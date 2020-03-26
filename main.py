@@ -21,7 +21,7 @@ class AFK():
     operation_list = [
         {'type': 'mouse.left', 'description': '鼠标左键'},
         {'type': 'mouse.right', 'description': '鼠标右键'},
-        {'type': 'mouse.move', 'description': '鼠标移动（测试）'},
+        {'type': 'mouse.move', 'description': '鼠标移动（不可用）'},
         {'type': 'keyboard.input', 'description': '键盘按键'},
         {'type': 'keyboard.str', 'description': '发送字符'}
     ]
@@ -95,10 +95,11 @@ class AFK():
             elif operation == 'left':
                 callback = Mouse(hwnd, delay_time, during_time, False)
                 self.do_job(callback.operate, repeat_times)
-            else:
+            elif operation == 'move':
                 distance = int(input('distance >>>'))
                 degree = int(input('degree >>>'))
-                mouse.moving(distance, degree, 5, 4)
+                callback = mouse.move(distance, degree)
+                self.do_job(callback, repeat_times)
         elif hardware == 'keyboard':
             if operation == 'input':
                 keys = input('请输入你的按键 >>>')

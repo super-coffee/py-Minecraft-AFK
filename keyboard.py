@@ -65,4 +65,5 @@ class Keyboard:
 
 
 if __name__ == "__main__":
-    KeyOperate().key()
+    # KeyOperate().key()
+    pass

@@ -1,6 +1,6 @@
 # py-Minecraft-AFK
 ![ICON](https://img.xiao-jin.xyz/2020/03/25/07f1e7d0de1f6.png)  
-![Python3](https://img.shields.io/badge/Python-3.7+-blue?color=3776AB&&logo=python) ![GPLv3](https://img.shields.io/github/license/jinzhijie/py-Minecraft-AFK) ![GitHub last commit (dev branch)](https://img.shields.io/github/last-commit/jinzhijie/py-Minecraft-AFK/dev) ![Pyinstaller](https://github.com/jinzhijie/py-Minecraft-AFK/workflows/Pyinstaller/badge.svg)
+![Python3](https://img.shields.io/badge/Python-3.7+-blue?color=3776AB&&logo=python) ![GPLv3](https://img.shields.io/github/license/jinzhijie/py-Minecraft-AFK) ![GitHub last commit (dev branch)](https://img.shields.io/github/last-commit/jinzhijie/py-Minecraft-AFK/dev) ![Pyinstaller](https://github.com/jinzhijie/py-Minecraft-AFK/workflows/Pyinstaller/badge.svg) ![Dev Code Check](https://github.com/jinzhijie/py-Minecraft-AFK/workflows/Dev%20Code%20Check/badge.svg?branch=dev)
 
 一个基于 win32api 的 Minecraft 的挂机程序，即使失去焦点或最小化依然可以完成鼠标/键盘的动作。  
 A win32api-based Minecraft AFK program that can complete mouse / keyboard actions even if it loses focus or is minimized.

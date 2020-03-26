@@ -26,17 +26,17 @@ class Keyboard:
         self.click_sign = True if during_time > 0 else False
 
     def operate(self, is_enter=False, is_up=False):  # 传入两个参数，是否为回车和是否为按下按键
-        wparam = win32con.WM_KEYUP if is_up else win32con.WM_KEYDOWN
+        msg = win32con.WM_KEYUP if is_up else win32con.WM_KEYDOWN
         # 根据输入得出wparam
         if not self.click_sign and is_enter:
             VkKeyCode = win32con.VK_RETURN  # 赋值回车的虚拟键值
             lparam = _get_lparam(VkKeyCode, is_up)  # 计算lparam
-            win32api.PostMessage(self.hwnd, wparam, VkKeyCode, lparam)
+            win32api.PostMessage(self.hwnd, msg, VkKeyCode, lparam)
         elif not self.click_sign and not is_enter:
             for key in self.keys:  # 遍历keys，操作所有定义的按键
                 VkKeyCode = win32api.VkKeyScan(key)  # 获得按键的虚拟键值
                 lparam = _get_lparam(VkKeyCode, is_up)  # 接下来大同小异
-                win32api.PostMessage(self.hwnd, wparam, VkKeyCode, lparam)
+                win32api.PostMessage(self.hwnd, msg, VkKeyCode, lparam)
         elif self.click_sign and is_enter:
             VkKeyCode = win32con.VK_RETURN  # 赋值回车的虚拟键值
             lparamUp = _get_lparam(VkKeyCode, True)  # 计算lparam

@@ -9,6 +9,8 @@ import win32gui
 from tqdm import tqdm
 from progress.spinner import Spinner
 
+from keyboard import Keyboard
+from mouse import Mouse
 import keyboard
 import mouse
 
@@ -21,7 +23,7 @@ class AFK():
         {'type': 'mouse.right', 'description': '鼠标右键'},
         {'type': 'mouse.move', 'description': '鼠标移动（测试）'},
         {'type': 'keyboard.input', 'description': '键盘按键'},
-        {'type': 'keyboard.enter', 'description': '键盘回车'}
+        {'type': 'keyboard.str', 'description': '发送字符'}
     ]
 
     def __init__(self):
@@ -30,10 +32,11 @@ class AFK():
 
     def get_hwnd_with_keyword(self, hwnd, unused):
         # 是现有窗口 & 启用了窗口 & 窗口具有WS_VISIBLE样式（非隐藏） & 窗口标题包含关键字
-        if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd).startswith(self.KEYWORD):
+        if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(
+                hwnd) and win32gui.GetWindowText(hwnd).startswith(self.KEYWORD):
             self.hwnds_list_of_taegets.append({
                 'title': win32gui.GetWindowText(hwnd),  # 窗口标题
-                'hwnd': hwnd  #  句柄 ID
+                'hwnd': hwnd  # 句柄 ID
             })
 
     def get_all_hwnd(self, hwnd, unused):
@@ -43,7 +46,7 @@ class AFK():
             # 加入列表
             self.hwnds_list_of_taegets.append({
                 'title': '* 无标题' if title == '' else title,  # 窗口标题
-                'hwnd': hwnd  #  句柄 ID
+                'hwnd': hwnd  # 句柄 ID
             })
 
     def layout_hwnd_list(self, hwnds_count):  # 输出窗口标题 & 句柄
@@ -51,31 +54,7 @@ class AFK():
             item = self.hwnds_list_of_taegets[hwnd_index_id]
             print('[{index}] {title}, {hwnd}'.format(index=hwnd_index_id, title=item['title'], hwnd=item['hwnd']))
 
-    def do_Keyboard(self, callback, args):
-        has_key_down_0 = -0b1000000000000000
-        has_key_down_1 = -0b111111111111111
-        key_down = 0b1
-        run_state = 1
-
-        print('>>> 在此窗口按下 ctrl+c 终止运行 <<<')
-        print('>>> 在此窗口按下右ctrl暂停运行 <<<')
-        print('>>> 在任何地方按下 右alt键 开始操作 <<<')
-        while True:
-            time.sleep(0.001)  # 不设延时吃 CPU
-            rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
-            if rmenu_status == has_key_down_0 or rmenu_status == has_key_down_1 or rmenu_status == key_down:
-                while True:
-                    rctrl_status = win32api.GetAsyncKeyState(win32con.VK_RCONTROL)
-                    if run_state:
-                        callback(*args).keydown()
-                        run_state = 0 if rctrl_status == has_key_down_0 else 1
-                    else:
-                        callback(*args).keyup()
-                        print("暂停操作")
-                        run_state = 1
-                        break
-
-    def do(self, callback, loop_time, args):
+    def do_job(self, callback, loop_time):
         has_key_down_0 = -0b1000000000000000
         has_key_down_1 = -0b111111111111111
         key_down = 0b1
@@ -88,36 +67,52 @@ class AFK():
             if rmenu_status == has_key_down_0 or rmenu_status == has_key_down_1 or rmenu_status == key_down:
                 if not loop_time == 0:
                     for _ in tqdm(range(loop_time), ascii=True):  # ascii=True 可防止多行进度条，loop_time 太大直接就炸
-                        callback(*args)
+                        callback(True)
+                    callback(False)
                     input('>>> 按下回车退出 <<<')
                     break
                 else:  # 无限循环
                     spinner = Spinner('正在执行     ')
                     while True:
+                        rctrl_status = win32api.GetAsyncKeyState(win32con.VK_RCONTROL)
                         spinner.next()
-                        callback(*args)
+                        callback()
+                        if rctrl_status == has_key_down_0:
+                            break
 
-    def ops(self, user_op_type, hwnd):
-        op_levels = user_op_type.split('.')  # 把硬件类型和操作分开放入列表
-        hardware = op_levels[0]  # 硬件类型  e.g. mouse
-        operation = op_levels[1]  # 操作  e.g. right
+    def classify(self, user_op_type, hwnd):
+        op_levels = user_op_type.split('.')
+        hardware = op_levels[0]
+        operation = op_levels[1]
 
-        loop_time = int(input('循环次数，0 为无限循环 >>>'))
-        if hardware == 'mouse' and not operation == 'move':
-            during_time = float(input('按下持续时间 >>>'))
-            delay_time = float(input('抬起持续时间 >>>'))
-            self.do(mouse.press, loop_time, (hwnd, operation, during_time, delay_time))
-        elif operation == 'move':  # 无需再次判断是否为鼠标
-            print('全是 bug，仅供测试！')
-            distance = int(input('distance >>>'))
-            degree = int(input('degree >>>'))
-            mouse.moving(distance, degree, 5, 4)
-        elif hardware == 'keyboard':  # 键盘需要提前判断
+        repeat_times = int(input("重复次数，0为无限重复>>>"))
+        during_time = float(input('按下持续时间 >>>'))
+        delay_time = float(input('抬起持续时间 >>>'))
+        if hardware == 'mouse':
+            if operation == 'right':
+                callback = Mouse(hwnd, delay_time, during_time, True)
+                self.do_job(callback.operate, repeat_times)
+            elif operation == 'left':
+                callback = Mouse(hwnd, delay_time, during_time, False)
+                self.do_job(callback.operate, repeat_times)
+            else:
+                distance = int(input('distance >>>'))
+                degree = int(input('degree >>>'))
+                mouse.moving(distance, degree, 5, 4)
+        elif hardware == 'keyboard':
             if operation == 'input':
                 keys = input('请输入你的按键 >>>')
-                self.do_Keyboard(keyboard.KeyOperate, (hwnd, keys))
-            elif operation == 'enter':
-                self.do(keyboard.enter, loop_time, (hwnd, ))
+                is_enter = True if input('是否为回车(Y/N)').lower() == 'y' else False
+                if is_enter:
+                    callback = Keyboard(hwnd, keys, delay_time, during_time, True)
+                    self.do_job(callback.operate, repeat_times)
+                else:
+                    callback = Keyboard(hwnd, keys, delay_time, during_time, False)
+                    self.do_job(callback.operate, repeat_times)
+            elif operation == 'str':
+                keys = input('请输入你的按键 >>>')
+                callback = Keyboard(hwnd, keys, delay_time, during_time, False)
+                self.do_job(callback.sendstr, repeat_times)
 
     def main(self):
         win32gui.EnumWindows(self.get_hwnd_with_keyword, None)  # 枚举屏幕上所有的顶级窗口，第一个参数为 callback，第二个没啥用。得到关键字窗口
@@ -134,20 +129,21 @@ class AFK():
             hwnds_count = len(self.hwnds_list_of_taegets)
             self.layout_hwnd_list(hwnds_count)
             user_input_index_id = int(input('请输入序号以选择窗口 >>>'))
-        
+
         HWND = self.hwnds_list_of_taegets[user_input_index_id]['hwnd']
 
         os.system('cls')  # 清空屏幕
         print('{title}, {hwnd}'.format(title=self.hwnds_list_of_taegets[user_input_index_id]['title'],
                                        hwnd=self.hwnds_list_of_taegets[user_input_index_id]['hwnd']))
-        
+
         op_len = len(self.operation_list)
         for op_index in range(op_len):
-            print('[{index}] {description}'.format(index=op_index, description=self.operation_list[op_index]['description']))
-        
+            print('[{index}] {description}'.format(index=op_index,
+                                                   description=self.operation_list[op_index]['description']))
+
         user_input_op = self.operation_list[int(input('请选择你要进行的操作 >>>'))]
         user_input_op_type = user_input_op['type']
-        self.ops(user_input_op_type, HWND)
+        self.classify(user_input_op_type, HWND)
 
 
 if __name__ == '__main__':

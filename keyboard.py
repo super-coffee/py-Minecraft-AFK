@@ -11,41 +11,58 @@ def _get_lparam(wparam, isKeyUp=True):
     return repeatCount | (scanCode << 16) | (0 << 24) | (prevKeyState << 30) | (transitionState << 31)
 
 
-class KeyOperate:
+def do_postmessage(hwnd, VkKeyCode, during_time, delay_time):
+    lparamUp = _get_lparam(VkKeyCode, True)
+    lparamDown = _get_lparam(VkKeyCode, False)
+    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamDown)
+    time.sleep(during_time)
+    win32api.PostMessage(hwnd, win32con.WM_KEYUP, VkKeyCode, lparamUp)
+    time.sleep(delay_time)
+
+
+class Keyboard:
     hwnd = None
     keys = None
+    delay_time = None
+    during_time = None
+    click_sign = False
+    is_enter = False,
 
-    def __init__(self, hwnd, keys):
-        self.hwnd = hwnd
+    def __init__(self, hwnd, keys, delay_time, during_time, is_enter):
+        self.hwnd = hwnd  # 获取句柄和按键
         self.keys = keys
+        self.delay_time = delay_time
+        self.during_time = during_time
+        self.is_enter = is_enter
+        self.click_sign = True if during_time > 0 else False
 
-    def keydown(self):
+    def operate(self, is_up=False):  # 传入两个参数，是否为回车和是否为按下按键
+        msg = win32con.WM_KEYUP if is_up else win32con.WM_KEYDOWN
+        # 根据输入得出wparam
+        if not self.click_sign and self.is_enter:
+            VkKeyCode = win32con.VK_RETURN  # 赋值回车的虚拟键值
+            lparam = _get_lparam(VkKeyCode, is_up)  # 计算lparam
+            win32api.PostMessage(self.hwnd, msg, VkKeyCode, lparam)
+        elif not self.click_sign and not self.is_enter:
+            for key in self.keys:  # 遍历keys，操作所有定义的按键
+                VkKeyCode = win32api.VkKeyScan(key)  # 获得按键的虚拟键值
+                lparam = _get_lparam(VkKeyCode, is_up)  # 接下来大同小异
+                win32api.PostMessage(self.hwnd, msg, VkKeyCode, lparam)
+        elif self.click_sign and self.is_enter:
+            VkKeyCode = win32con.VK_RETURN  # 赋值回车的虚拟键值
+            do_postmessage(self.hwnd, VkKeyCode, self.during_time, self.delay_time)
+        else:
+            for key in self.keys:  # 遍历keys，操作所有定义的按键
+                VkKeyCode = win32api.VkKeyScan(key)  # 获得按键的虚拟键值
+                do_postmessage(self.hwnd, VkKeyCode, self.during_time, self.delay_time)
+
+    def sendstr(self):
         for key in self.keys:
-            # 得到 wparam
             VkKeyCode = win32api.VkKeyScan(key)
-            # 得到 lparam
-            lparamDown = _get_lparam(VkKeyCode, False)
-            # PostMessage
-            win32api.PostMessage(self.hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamDown)
-            time.sleep(0.0001)
-
-    def keyup(self):
-        for key in self.keys:
-        # 得到 wparam
-            VkKeyCode = win32api.VkKeyScan(key)
-            # 得到 lparam
-            lparamUp = _get_lparam(VkKeyCode, True)
-            # PostMessage
-            win32api.PostMessage(self.hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamUp)
-            time.sleep(0.0001)
+            win32api.PostMessage(self.hwnd, 0, VkKeyCode, 0)
+            time.sleep(self.delay_time)
 
 
-
-
-def enter(hwnd):
-    # 得到 wparam
-    wparam = win32con.VK_RETURN
-    # 得到 lparam
-    lparam = _get_lparam(wparam, False)
-    # PostMessage
-    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, wparam, lparam)
+if __name__ == "__main__":
+    # KeyOperate().key()
+    pass

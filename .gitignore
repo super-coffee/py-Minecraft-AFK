@@ -127,9 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/modules.xml
-.idea/py-Minecraft-AFK.iml
-.idea/vcs.xml
-.idea/dictionaries/Charlie.xml
-.idea/misc.xml
+.idea

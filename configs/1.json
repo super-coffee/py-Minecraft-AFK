@@ -1,0 +1,19 @@
+[
+    {
+        "class": [
+            {
+                "op_type": "mouse.left",
+                "loop_times": 1,
+                "down_time": 0.1,
+                "up_time": 0.1
+            },
+            {
+                "op_type": "mouse.right",
+                "loop_times": 1,
+                "down_time": 0.1,
+                "up_time": 0.1
+            }
+        ],
+        "loop_times": 100
+    }
+]

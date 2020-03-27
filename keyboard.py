@@ -11,6 +11,15 @@ def _get_lparam(wparam, isKeyUp=True):
     return repeatCount | (scanCode << 16) | (0 << 24) | (prevKeyState << 30) | (transitionState << 31)
 
 
+def do_postmessage(hwnd, VkKeyCode, during_time, delay_time):
+    lparamUp = _get_lparam(VkKeyCode, True)
+    lparamDown = _get_lparam(VkKeyCode, False)
+    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamDown)
+    time.sleep(during_time)
+    win32api.PostMessage(hwnd, win32con.WM_KEYUP, VkKeyCode, lparamUp)
+    time.sleep(delay_time)
+
+
 class Keyboard:
     hwnd = None
     keys = None
@@ -41,21 +50,11 @@ class Keyboard:
                 win32api.PostMessage(self.hwnd, msg, VkKeyCode, lparam)
         elif self.click_sign and self.is_enter:
             VkKeyCode = win32con.VK_RETURN  # 赋值回车的虚拟键值
-            lparamUp = _get_lparam(VkKeyCode, True)  # 计算lparam
-            lparamDown = _get_lparam(VkKeyCode, False)
-            win32api.PostMessage(self.hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamDown)
-            time.sleep(self.during_time)
-            win32api.PostMessage(self.hwnd, win32con.WM_KEYUP, VkKeyCode, lparamUp)
-            time.sleep(self.delay_time)
+            do_postmessage(self.hwnd, VkKeyCode, self.during_time, self.delay_time)
         else:
             for key in self.keys:  # 遍历keys，操作所有定义的按键
                 VkKeyCode = win32api.VkKeyScan(key)  # 获得按键的虚拟键值
-                lparamUp = _get_lparam(VkKeyCode, True)  # 计算lparam
-                lparamDown = _get_lparam(VkKeyCode, False)
-                win32api.PostMessage(self.hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamDown)
-                time.sleep(self.during_time)
-                win32api.PostMessage(self.hwnd, win32con.WM_KEYUP, VkKeyCode, lparamUp)
-                time.sleep(self.delay_time)
+                do_postmessage(self.hwnd, VkKeyCode, self.during_time, self.delay_time)
 
     def sendstr(self):
         for key in self.keys:

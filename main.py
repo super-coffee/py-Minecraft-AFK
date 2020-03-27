@@ -53,7 +53,7 @@ class AFK():
             item = self.hwnds_list_of_taegets[hwnd_index_id]
             print('[{index}] {title}, {hwnd}'.format(index=hwnd_index_id, title=item['title'], hwnd=item['hwnd']))
 
-    def do_job(self, call_func, args, loop_times):
+    def do_job(self, call_func, args, loop_times, op_type):
         has_key_down_0 = -0b1000000000000000
         has_key_down_1 = -0b111111111111111
         key_down = 0b1
@@ -66,51 +66,62 @@ class AFK():
             if rmenu_status == has_key_down_0 or rmenu_status == has_key_down_1 or rmenu_status == key_down:
                 if not loop_times == 0:
                     for _ in tqdm(range(loop_times), ascii=True):  # ascii=True 可防止多行进度条，loop_time 太大直接就炸
-                        call_func(*args)
+                        if op_type[0] == "keyboard":
+                            call_func(False)
+                        else:
+                            call_func(*args)
+                    if op_type[0] == "keyboard":
+                        call_func(True)
                     input('>>> 完成，按下回车退出 <<<')
                     break
                 else:  # 无限循环
                     spinner = Spinner('正在执行     ')  # 空格防止奇怪的事发生
                     while True:
                         time.sleep(0.001)  # 不设延时吃 CPU
-                        rctrl_status = win32api.GetAsyncKeyState(win32con.VK_RCONTROL)
+                        rctrl_status = win32api.GetAsyncKeyState(win32con.VK_RSHIFT)
                         spinner.next()
-                        call_func(*args)
+                        if op_type[0] == "keyboard":
+                            call_func(False)
+                        else:
+                            call_func(*args)
                         if rctrl_status == has_key_down_0:
+                            if op_type[0] == "keyboard":
+                                call_func(True)
                             break
 
     def classify(self, user_op_type, hwnd):
         op_levels = user_op_type.split('.')
         hardware = op_levels[0]
         operation = op_levels[1]
+        op_type = list()
+        op_type.append(hardware)
 
         loop_times = int(input("重复次数，0为无限重复 >>>"))
         during_time = float(input('操作时间（秒） >>>'))
         delay_time = float(input('延时（秒） >>>'))
         if hardware == 'mouse':
             if operation == 'right':
-                self.do_job(mouse.right, (hwnd, during_time, delay_time), loop_times)
+                self.do_job(mouse.right, (hwnd, during_time, delay_time), loop_times, op_type)
             elif operation == 'left':
-                self.do_job(mouse.left, (hwnd, during_time, delay_time), loop_times)
+                self.do_job(mouse.left, (hwnd, during_time, delay_time), loop_times, op_type)
             elif operation == 'move':
                 distance = int(input('distance >>>'))
                 degree = int(input('degree >>>'))
-                self.do_job(mouse.move, (distance, degree), loop_times)
+                self.do_job(mouse.move, (distance, degree), loop_times, op_type)
         elif hardware == 'keyboard':
             if operation == 'input':
                 keys = input('请输入你的按键 >>>')
                 is_enter = True if input('是否为回车(Y/N)').lower() == 'y' else False
                 if is_enter:
                     call_func = Keyboard(hwnd, keys, delay_time, during_time, True)
-                    self.do_job(call_func.operate, loop_times)
-                    self.do_job(mouse.move, (distance, degree), loop_times)
+                    self.do_job(call_func.operate, (), loop_times,op_type)
                 else:
                     call_func = Keyboard(hwnd, keys, delay_time, during_time, False)
-                    self.do_job(call_func.operate, loop_times)
+                    self.do_job(call_func.operate, (),  loop_times, op_type)
             elif operation == 'str':
                 keys = input('请输入你的按键 >>>')
                 call_func = Keyboard(hwnd, keys, delay_time, during_time, False)
-                self.do_job(call_func.sendstr, loop_times)
+                self.do_job(call_func.sendstr, (), loop_times, op_type)
 
     def main(self):
         win32gui.EnumWindows(self.get_hwnd_with_keyword, None)  # 枚举屏幕上所有的顶级窗口，第一个参数为 call_func，第二个没啥用。得到关键字窗口

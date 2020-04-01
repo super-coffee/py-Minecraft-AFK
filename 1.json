@@ -1,6 +1,0 @@
-keyboard构造函数传入句柄, 按键, 延迟时间, 操作时间, 是不是回车（之后会改为是不是特殊按键）
-
-callback = Keyboard(hwnd, keys, delay_time, during_time, is_enter)
-callback = Keyboard(句柄, "w", 1, 1, True)
-callback.operate(is_up)是否为释放按键
-callback.operate(True)

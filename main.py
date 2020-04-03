@@ -8,10 +8,11 @@ import win32con
 import win32gui
 from tqdm import tqdm
 from progress.spinner import Spinner
-
+import configs
 from keyboard import Keyboard
 import keyboard
 import mouse
+from mouse import Mouse
 
 
 class AFK():
@@ -53,7 +54,7 @@ class AFK():
             item = self.hwnds_list_of_taegets[hwnd_index_id]
             print('[{index}] {title}, {hwnd}'.format(index=hwnd_index_id, title=item['title'], hwnd=item['hwnd']))
 
-    def do_job(self, call_func, args, loop_times, op_type):
+    def do_job(self, call_func, loop_times, op_type):
         has_key_down_0 = -0b1000000000000000
         has_key_down_1 = -0b111111111111111
         key_down = 0b1
@@ -89,39 +90,36 @@ class AFK():
                                 call_func(True)
                             break
 
-    def classify(self, user_op_type, hwnd):
-        op_levels = user_op_type.split('.')
-        hardware = op_levels[0]
-        operation = op_levels[1]
-        op_type = list()
-        op_type.append(hardware)
+    def classify(self, hwnd):
+        config_list = configs.find('./configs/', '.json')
+        if len(config_list):
+            for index in range(len(config_list)):
+                print('[{index}] {name}'.format(index=index, name=config_list[index]['name']))
+            config = configs.parser(configs.read(config_list[int(input('请输入要读取的配置序号>>>'))]['path']))
+        else:
+            config = configs.generate_simple_config()
+        for cfg in config:
+            op_levels = cfg['op_type'].split('.')
+            hardware = op_levels[0]
+            operation = op_levels[1]
+            if hardware == 'keyboard':
+                if operation == 'press':
+                    call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
+                    self.do_job(call_func.press, cfg['loop_times'])
+                elif operation =='move':
+                    call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
+                    self.do_job(call_func.move, cfg['loop_times'])
+            elif hardware == 'keyboard':
+                if operation == 'input':
+                    call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
+                    self.do_job(call_func.operate, cfg['loop_times'])
+                elif operation == 'str':
+                    call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
+                    self.do_job(call_func.sendstr, cfg['loop_times'])
 
-        loop_times = int(input("重复次数，0为无限重复 >>>"))
-        during_time = float(input('操作时间（秒） >>>'))
-        delay_time = float(input('延时（秒） >>>'))
-        if hardware == 'mouse':
-            if operation == 'right':
-                self.do_job(mouse.right, (hwnd, during_time, delay_time), loop_times, op_type)
-            elif operation == 'left':
-                self.do_job(mouse.left, (hwnd, during_time, delay_time), loop_times, op_type)
-            elif operation == 'move':
-                distance = int(input('distance >>>'))
-                degree = int(input('degree >>>'))
-                self.do_job(mouse.move, (distance, degree), loop_times, op_type)
-        elif hardware == 'keyboard':
-            if operation == 'input':
-                keys = input('请输入你的按键 >>>')
-                is_enter = True if input('是否为回车(Y/N)').lower() == 'y' else False
-                if is_enter:
-                    call_func = Keyboard(hwnd, keys, delay_time, during_time, True)
-                    self.do_job(call_func.operate, (), loop_times,op_type)
-                else:
-                    call_func = Keyboard(hwnd, keys, delay_time, during_time, False)
-                    self.do_job(call_func.operate, (),  loop_times, op_type)
-            elif operation == 'str':
-                keys = input('请输入你的按键 >>>')
-                call_func = Keyboard(hwnd, keys, delay_time, during_time, False)
-                self.do_job(call_func.sendstr, (), loop_times, op_type)
+
+
+
 
     def main(self):
         win32gui.EnumWindows(self.get_hwnd_with_keyword, None)  # 枚举屏幕上所有的顶级窗口，第一个参数为 call_func，第二个没啥用。得到关键字窗口

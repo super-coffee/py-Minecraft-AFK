@@ -4,6 +4,7 @@ import time
 import win32api
 import win32con
 import win32gui
+from universal_function import *
 
 
 def _get_client_center_pos(hwnd):
@@ -17,7 +18,7 @@ def _get_pos_bin(x, y):
     return (y << 16) | x
 
 
-def move(distance, degree, time_usage=5, step=4):
+def moving(distance, degree, time_usage=5, step=4):
     mousepos = list(win32api.GetCursorPos())  # 获得mc的基准光标
     deta_X = int(step * math.sin(math.radians(degree)))
     deta_Y = int(step * math.cos(math.radians(degree)))
@@ -53,20 +54,44 @@ def move(distance, degree, time_usage=5, step=4):
             time.sleep(time_each_repetition - time_use - correct)
 
 
-def left(hwnd, during_time, delay_time):
-    pos = _get_client_center_pos(hwnd)
-    win32api.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, 0, pos)
-    time.sleep(during_time)
-    win32api.PostMessage(hwnd, win32con.WM_LBUTTONUP, 0, pos)
-    time.sleep(delay_time)
+def do_postmessage(hwnd, during_time, delay_time, key, pos, callback, args):
+    win32api.PostMessage(hwnd, key[0], 0, pos)
+    nonblocking_delay(during_time, callback, args)
+    win32api.PostMessage(hwnd, key[1], 0, pos)
+    nonblocking_delay(delay_time, callback, args)
 
 
-def right(hwnd, during_time, delay_time):
-    pos = _get_client_center_pos(hwnd)
-    win32api.PostMessage(hwnd, win32con.WM_RBUTTONDOWN, 0, pos)
-    time.sleep(during_time)
-    win32api.PostMessage(hwnd, win32con.WM_RBUTTONUP, 0, pos)
-    time.sleep(delay_time)
+class Mouse:
+    hwnd = None
+    keys = None
+    delay_time = None
+    during_time = None
+    click_sign = False
+
+    def __init__(self, hwnd, keys, delay_time, during_time):
+        self.hwnd = hwnd  # 获取句柄和按键
+        self.keys = keys
+        self.delay_time = delay_time
+        self.during_time = during_time
+        self.click_sign = True if during_time > 0 else False
+
+    def press(self, is_up=False, callback=default_callback, args=None):
+        pos = _get_client_center_pos(self.hwnd)
+        index = 1 if is_up else 0
+        if self.keys == 0:
+            mouse_key = [win32con.WM_LBUTTONDOWN, win32con.WM_LBUTTONUP]
+        elif self.keys == 1:
+            mouse_key = [win32con.WM_RBUTTONDOWN, win32con.WM_RBUTTONUP]
+        else:
+            mouse_key = [win32con.WM_MBUTTONDOWN, win32con.WM_MBUTTONUP]
+        if self.click_sign:
+            do_postmessage(self.hwnd, self.during_time, self.delay_time, mouse_key, pos, callback, args)
+        else:
+            win32api.PostMessage(self.hwnd, mouse_key[index], 0, pos)
+
+    def move(self):
+        pass
+
 
 
 if __name__ == '__main__':  # DEBUG

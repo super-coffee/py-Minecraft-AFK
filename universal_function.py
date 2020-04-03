@@ -20,7 +20,7 @@ def nonblocking_delay(delay_time, callback, args):
     while True:
         callback(args)
         now = time.time()
-        if now - start == delay_time:
+        if now - start >= delay_time:
             break
 
 

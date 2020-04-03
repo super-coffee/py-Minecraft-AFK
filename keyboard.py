@@ -55,7 +55,7 @@ class Keyboard:
                 args.append((self.hwnd, win32con.WM_KEYUP, VkKeyCode, get_lparam(VkKeyCode, True)))
                 _do_postmessage(self.hwnd, VkKeyCode, self.during_time, self.delay_time, callback, args)
 
-    def sendstr(self):
+    def sendstr(self, is_up=False, callback=default_callback, args=None):
         for key in self.keys:
             VkKeyCode = win32api.VkKeyScan(key)
             win32api.PostMessage(self.hwnd, 0, VkKeyCode, 0)

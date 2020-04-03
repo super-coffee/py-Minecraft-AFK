@@ -58,10 +58,9 @@ class AFK():
             time.sleep(0.001)
             rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
             if rmenu_status == KD0 or rmenu_status == KD1 or rmenu_status == KD2:
-                for _ in range(loop_times):
-                    callback(callback=stop, args=[win32con.VK_RCONTROL])
-                print('a')
                 break
+        for _ in range(loop_times):
+            callback(callback=stop, args=[win32con.VK_RCONTROL])
 
     def classify(self, hwnd, cfg):
         op_levels = cfg['op_type'].split('.')

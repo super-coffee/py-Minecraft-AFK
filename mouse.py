@@ -1,21 +1,9 @@
 import math
 import time
-
 import win32api
 import win32con
 import win32gui
 from universal_function import *
-
-
-def _get_client_center_pos(hwnd):
-    x1, x2, y1, y2 = win32gui.GetClientRect(hwnd)
-    average_x = round((x1 + y1) / 2)
-    average_y = round((x2 + y2) / 2)
-    return _get_pos_bin(average_x, average_y)
-
-
-def _get_pos_bin(x, y):
-    return (y << 16) | x
 
 
 def moving(distance, degree, time_usage=5, step=4):
@@ -54,13 +42,6 @@ def moving(distance, degree, time_usage=5, step=4):
             time.sleep(time_each_repetition - time_use - correct)
 
 
-def do_postmessage(hwnd, during_time, delay_time, key, pos, callback, args):
-    win32api.PostMessage(hwnd, key[0], 0, pos)
-    nonblocking_delay(during_time, callback, args)
-    win32api.PostMessage(hwnd, key[1], 0, pos)
-    nonblocking_delay(delay_time, callback, args)
-
-
 class Mouse:
     hwnd = None
     keys = None
@@ -76,7 +57,7 @@ class Mouse:
         self.click_sign = True if during_time > 0 else False
 
     def press(self, is_up=False, callback=default_callback, args=None):
-        pos = _get_client_center_pos(self.hwnd)
+        pos = get_client_center_pos(self.hwnd)
         index = 1 if is_up else 0
         if self.keys == 0:
             mouse_key = [win32con.WM_LBUTTONDOWN, win32con.WM_LBUTTONUP]
@@ -85,11 +66,12 @@ class Mouse:
         else:
             mouse_key = [win32con.WM_MBUTTONDOWN, win32con.WM_MBUTTONUP]
         if self.click_sign:
+            args.append((self.hwnd, mouse_key[1], 0, pos))
             do_postmessage(self.hwnd, self.during_time, self.delay_time, mouse_key, pos, callback, args)
         else:
             win32api.PostMessage(self.hwnd, mouse_key[index], 0, pos)
 
-    def move(self):
+    def move(self, is_up=False, callback=default_callback, args=None):
         pass
 
 

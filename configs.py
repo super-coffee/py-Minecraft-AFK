@@ -7,11 +7,11 @@ def find(path, suffix):
     config_list = list()
     for filename in os.listdir(path):
         if filename.endswith(suffix):
-            path = path + filename
+            _path = path + filename
             name = filename.rstrip(suffix)
             config_list.append({
                 'name': name,
-                'path': path
+                'path': _path
             })
     return config_list
 

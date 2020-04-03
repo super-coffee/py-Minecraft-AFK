@@ -8,22 +8,20 @@ import win32con
 import win32gui
 from tqdm import tqdm
 from progress.spinner import Spinner
-
+import configs
 from keyboard import Keyboard
-import keyboard
-import mouse
+from mouse import Mouse
+from universal_function import stop
+
+# 伪宏定义
+KD0 = -0b1000000000000000
+KD1 = -0b111111111111111
+KD2 = 0b1
 
 
 class AFK():
     hwnds_list_of_taegets = list()  # 无法获取返回值，只能全局变量
     KEYWORD = 'Minecraft'
-    operation_list = [
-        {'type': 'mouse.left', 'description': '鼠标左键'},
-        {'type': 'mouse.right', 'description': '鼠标右键'},
-        {'type': 'mouse.move', 'description': '鼠标移动（不可用）'},
-        {'type': 'keyboard.input', 'description': '键盘按键'},
-        {'type': 'keyboard.str', 'description': '发送字符'}
-    ]
 
     def __init__(self):
         os.system('title py-Minecraft-AFK')
@@ -53,75 +51,36 @@ class AFK():
             item = self.hwnds_list_of_taegets[hwnd_index_id]
             print('[{index}] {title}, {hwnd}'.format(index=hwnd_index_id, title=item['title'], hwnd=item['hwnd']))
 
-    def do_job(self, call_func, args, loop_times, op_type):
-        has_key_down_0 = -0b1000000000000000
-        has_key_down_1 = -0b111111111111111
-        key_down = 0b1
-
+    def do_job(self, callback, loop_times):
         print('>>> 在此窗口按下 ctrl+c 终止运行 <<<')
         print('>>> 在任何地方按下 右alt键 开始操作 <<<')
         while True:
-            time.sleep(0.001)  # 不设延时吃 CPU
+            time.sleep(0.001)
             rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
-            if rmenu_status == has_key_down_0 or rmenu_status == has_key_down_1 or rmenu_status == key_down:
-                if not loop_times == 0:
-                    for _ in tqdm(range(loop_times), ascii=True):  # ascii=True 可防止多行进度条，loop_time 太大直接就炸
-                        if op_type[0] == "keyboard":
-                            call_func(False)
-                        else:
-                            call_func(*args)
-                    if op_type[0] == "keyboard":
-                        call_func(True)
-                    input('>>> 完成，按下回车退出 <<<')
-                    break
-                else:  # 无限循环
-                    spinner = Spinner('正在执行     ')  # 空格防止奇怪的事发生
-                    while True:
-                        time.sleep(0.001)  # 不设延时吃 CPU
-                        rctrl_status = win32api.GetAsyncKeyState(win32con.VK_RSHIFT)
-                        spinner.next()
-                        if op_type[0] == "keyboard":
-                            call_func(False)
-                        else:
-                            call_func(*args)
-                        if rctrl_status == has_key_down_0:
-                            if op_type[0] == "keyboard":
-                                call_func(True)
-                            break
+            if rmenu_status == KD0 or rmenu_status == KD1 or rmenu_status == KD2:
+                for _ in range(loop_times):
+                    callback(callback=stop, args=[win32con.VK_RCONTROL])
+                print('a')
+                break
 
-    def classify(self, user_op_type, hwnd):
-        op_levels = user_op_type.split('.')
+    def classify(self, hwnd, cfg):
+        op_levels = cfg['op_type'].split('.')
         hardware = op_levels[0]
         operation = op_levels[1]
-        op_type = list()
-        op_type.append(hardware)
-
-        loop_times = int(input("重复次数，0为无限重复 >>>"))
-        during_time = float(input('操作时间（秒） >>>'))
-        delay_time = float(input('延时（秒） >>>'))
         if hardware == 'mouse':
-            if operation == 'right':
-                self.do_job(mouse.right, (hwnd, during_time, delay_time), loop_times, op_type)
-            elif operation == 'left':
-                self.do_job(mouse.left, (hwnd, during_time, delay_time), loop_times, op_type)
-            elif operation == 'move':
-                distance = int(input('distance >>>'))
-                degree = int(input('degree >>>'))
-                self.do_job(mouse.move, (distance, degree), loop_times, op_type)
+            if operation == 'press':
+                call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
+                self.do_job(call_func.press, cfg['loop_times'])
+            elif operation =='move':
+                call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
+                self.do_job(call_func.move, cfg['loop_times'])
         elif hardware == 'keyboard':
             if operation == 'input':
-                keys = input('请输入你的按键 >>>')
-                is_enter = True if input('是否为回车(Y/N)').lower() == 'y' else False
-                if is_enter:
-                    call_func = Keyboard(hwnd, keys, delay_time, during_time, True)
-                    self.do_job(call_func.operate, (), loop_times,op_type)
-                else:
-                    call_func = Keyboard(hwnd, keys, delay_time, during_time, False)
-                    self.do_job(call_func.operate, (),  loop_times, op_type)
+                call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
+                self.do_job(call_func.operate, cfg['loop_times'])
             elif operation == 'str':
-                keys = input('请输入你的按键 >>>')
-                call_func = Keyboard(hwnd, keys, delay_time, during_time, False)
-                self.do_job(call_func.sendstr, (), loop_times, op_type)
+                call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
+                self.do_job(call_func.sendstr, cfg['loop_times'])
 
     def main(self):
         win32gui.EnumWindows(self.get_hwnd_with_keyword, None)  # 枚举屏幕上所有的顶级窗口，第一个参数为 call_func，第二个没啥用。得到关键字窗口
@@ -142,17 +101,20 @@ class AFK():
         HWND = self.hwnds_list_of_taegets[user_input_index_id]['hwnd']
 
         os.system('cls')  # 清空屏幕
-        print('{title}, {hwnd}'.format(title=self.hwnds_list_of_taegets[user_input_index_id]['title'],
-                                       hwnd=self.hwnds_list_of_taegets[user_input_index_id]['hwnd']))
 
-        op_len = len(self.operation_list)
-        for op_index in range(op_len):
-            print('[{index}] {description}'.format(index=op_index,
-                                                   description=self.operation_list[op_index]['description']))
-
-        user_input_op = self.operation_list[int(input('请选择你要进行的操作 >>>'))]
-        user_input_op_type = user_input_op['type']
-        self.classify(user_input_op_type, HWND)
+        config_list = configs.find('./configs/', '.json')
+        if len(config_list):
+            for index in range(len(config_list)):
+                print('[{index}] {name}'.format(index=index, name=config_list[index]['name']))
+            cfgs = configs.read(config_list[int(input('请输入要读取的配置序号>>>'))]['path'])
+        else:
+            cfgs = configs.generate_simple_config()
+        config = cfgs[0]['multi'] if 'class' in cfgs else cfgs[0]['class']
+        loop_times = cfgs[0]['loop_times']
+        for _ in range(loop_times):
+            for cfg in config:
+                print('b')
+                self.classify(HWND, cfg)
 
 
 if __name__ == '__main__':

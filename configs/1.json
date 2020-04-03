@@ -12,6 +12,27 @@
                 "loop_times": 1,
                 "down_time": 0.1,
                 "up_time": 0.1
+            },
+            {
+                "op_type": "keyboard.press",
+                "loop_times": 1,
+                "down_time": 0.1,
+                "up_time": 0,
+                "keys": "w"
+            },
+            {
+                "op_type": "keyboard.click",
+                "loop_times": 1,
+                "down_time": 0.001,
+                "up_time": 0.1,
+                "keys": "w"
+            },
+            {
+                "op_type": "keyboard.sendstr",
+                "loop_times": 1,
+                "down_time": 0.001,
+                "up_time": 0.1,
+                "keys": "w"
             }
         ],
         "loop_times": 100

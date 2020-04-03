@@ -23,9 +23,9 @@ def read(file_name):
     return config
 
 
-def pack(oparate, during_time, delay_time, loop_times, keys, op_list):
+def pack(operate, during_time, delay_time, loop_times, keys, op_list):
     op_list.append({
-        "op_type": oparate,
+        "op_type": operate,
         "loop_times": loop_times,
         "down_time": during_time,
         "up_time": delay_time,
@@ -58,7 +58,7 @@ def generate_simple_config():
             if operate == 'press':
                 delay_time = int(input('请输入按键抬起持续时间，若为0，则长按>>>'))
                 during_time = int(input('请输入按键按下时间>>>')) if delay_time else 0
-                keys = int(input('请输入按键 ，1为左键，2为右键，3为中键>>>'))
+                keys = int(input('请输入按键 ，0为左键，1为右键，2为中键>>>'))
                 loop_times = int(input('请输入重复次数，若为-1，则无限重复>>>')) if delay_time else 0
                 pack(final_operate, during_time, delay_time, loop_times, keys, li)
             else:
@@ -78,6 +78,12 @@ def create_Json(Json, path, name):
     with open(filepath, 'w') as config:
         config.write(json.dumps(Json))
         print('已保存至 {filename}'.format(filename=filepath))
+
+
+def parser(Json):
+    for operate in Json:
+        op_list = operate['class']
+    return op_list
 
 
 if __name__ == '__main__':

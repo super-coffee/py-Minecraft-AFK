@@ -80,11 +80,5 @@ def create_Json(Json, path, name):
         print('已保存至 {filename}'.format(filename=filepath))
 
 
-def parser(Json):
-    for operate in Json:
-        op_list = operate['class']
-    return op_list
-
-
 if __name__ == '__main__':
     print(generate_simple_config())

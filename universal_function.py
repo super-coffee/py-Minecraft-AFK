@@ -1,5 +1,4 @@
 import time
-
 import win32api
 import win32gui
 
@@ -20,7 +19,7 @@ def nonblocking_delay(delay_time, callback, args):
     while True:
         callback(args)
         now = time.time()
-        if now - start == delay_time:
+        if now - start >= delay_time:
             break
 
 
@@ -54,10 +53,9 @@ def stop(arg):
     key_status = win32api.GetAsyncKeyState(arg[0])
     if key_status == KD1:
         win32api.PostMessage(*arg[1])
+        print("已暂停")
         while True:
             key_status = win32api.GetAsyncKeyState(arg[0])
             if key_status == KD1:
+                print("恢复运行")
                 break
-
-
-

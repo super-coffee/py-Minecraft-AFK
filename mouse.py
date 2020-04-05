@@ -2,8 +2,9 @@ import math
 import time
 import win32api
 import win32con
-import win32gui
-from universal_function import *
+from universal_function import get_client_center_pos
+from universal_function import default_callback
+from universal_function import do_postmessage
 
 
 def moving(distance, degree, time_usage=5, step=4):
@@ -73,7 +74,6 @@ class Mouse:
 
     def move(self, is_up=False, callback=default_callback, args=None):
         pass
-
 
 
 if __name__ == '__main__':  # DEBUG

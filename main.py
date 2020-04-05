@@ -11,17 +11,13 @@ from progress.spinner import Spinner
 import configs
 from keyboard import Keyboard
 from mouse import Mouse
-from universal_function import stop
-
-# 伪宏定义
-KD0 = -0b1000000000000000
-KD1 = -0b111111111111111
-KD2 = 0b1
+from universal_function import stop, KD0, KD1, KD2
 
 
 class AFK():
     hwnds_list_of_taegets = list()  # 无法获取返回值，只能全局变量
     KEYWORD = 'Minecraft'
+    run_status = True
 
     def __init__(self):
         os.system('title py-Minecraft-AFK')
@@ -52,16 +48,17 @@ class AFK():
             print('[{index}] {title}, {hwnd}'.format(index=hwnd_index_id, title=item['title'], hwnd=item['hwnd']))
 
     def do_job(self, callback, loop_times):
-        print('>>> 在此窗口按下 ctrl+c 终止运行 <<<')
-        print('>>> 在任何地方按下 右alt键 开始操作 <<<')
-        while True:
-            time.sleep(0.001)
-            rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
-            if rmenu_status == KD0 or rmenu_status == KD1 or rmenu_status == KD2:
-                for _ in range(loop_times):
-                    callback(callback=stop, args=[win32con.VK_RCONTROL])
-                print('a')
-                break
+        if self.run_status:
+            print('>>> 在此窗口按下 ctrl+c 终止运行 <<<')
+            print('>>> 在任何地方按下 右alt键 开始操作 <<<')
+            while True:
+                time.sleep(0.001)
+                rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
+                if rmenu_status == KD0 or rmenu_status == KD1 or rmenu_status == KD2:
+                    self.run_status = False
+                    break
+        for _ in range(loop_times):
+            callback(callback=stop, args=[win32con.VK_RCONTROL])
 
     def classify(self, hwnd, cfg):
         op_levels = cfg['op_type'].split('.')
@@ -111,9 +108,8 @@ class AFK():
             cfgs = configs.generate_simple_config()
         config = cfgs[0]['multi'] if 'class' in cfgs else cfgs[0]['class']
         loop_times = cfgs[0]['loop_times']
-        for _ in range(loop_times):
+        for _ in tqdm(range(loop_times), ascii=True):
             for cfg in config:
-                print('b')
                 self.classify(HWND, cfg)
 
 

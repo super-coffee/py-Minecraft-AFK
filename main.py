@@ -1,5 +1,4 @@
 # coding: UTF-8
-# https://github.com/jinzhijie/py-Minecraft-AFK
 import os
 import time
 
@@ -57,7 +56,7 @@ class AFK():
                 if rmenu_status == KD0 or rmenu_status == KD1 or rmenu_status == KD2:
                     self.run_status = False
                     break
-        for _ in range(loop_times):
+        for _ in tqdm(range(loop_times), ascii=True):
             callback(callback=stop, args=[win32con.VK_RCONTROL])
 
     def classify(self, hwnd, cfg):
@@ -102,13 +101,14 @@ class AFK():
         config_list = configs.find('./configs/', '.json')
         if len(config_list):
             for index in range(len(config_list)):
-                print('[{index}] {name}'.format(index=index, name=config_list[index]['name']))
+                print('[%s] %s' % (index, config_list[index]['name']))
             cfgs = configs.read(config_list[int(input('请输入要读取的配置序号>>>'))]['path'])
         else:
+            print('未发现配置文件，请按提示创建配置文件')
             cfgs = configs.generate_simple_config()
         config = cfgs[0]['multi'] if 'class' in cfgs else cfgs[0]['class']
         loop_times = cfgs[0]['loop_times']
-        for _ in tqdm(range(loop_times), ascii=True):
+        for _ in range(loop_times):
             for cfg in config:
                 self.classify(HWND, cfg)
 

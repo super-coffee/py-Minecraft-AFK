@@ -56,8 +56,12 @@ class AFK():
                 if rmenu_status == KD0 or rmenu_status == KD1 or rmenu_status == KD2:
                     self.run_status = False
                     break
-        for _ in tqdm(range(loop_times), ascii=True):
-            callback(callback=stop, args=[win32con.VK_RCONTROL])
+        if loop_times == -1:
+            while True:
+                callback(callback=stop, args=[win32con.VK_RCONTROL, win32con.VK_RMENU])
+        else:
+            for _ in tqdm(range(loop_times), ascii=True):
+                callback(callback=stop, args=[win32con.VK_RCONTROL, win32con.VK_RMENU])
 
     def classify(self, hwnd, cfg):
         op_levels = cfg['op_type'].split('.')

@@ -63,26 +63,28 @@ class AFK():
             for _ in tqdm(range(loop_times), ascii=True):
                 callback(callback=stop, args=[win32con.VK_RCONTROL, win32con.VK_RMENU])
 
-    def classify(self, hwnd, cfg):
-        op_levels = cfg['op_type'].split('.')
-        hardware = op_levels[0]
-        operation = op_levels[1]
-        if hardware == 'mouse':
-            if operation == 'press':
-                call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
-                self.do_job(call_func.press, cfg['loop_times'])
-            elif operation =='move':
-                call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
-                self.do_job(call_func.move, cfg['loop_times'])
-        elif hardware == 'keyboard':
-            if operation == 'input':
-                call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
-                self.do_job(call_func.operate, cfg['loop_times'])
-            elif operation == 'str':
-                call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
-                self.do_job(call_func.sendstr, cfg['loop_times'])
+    def classify(self, hwnd, step):
+        for cfg in step:
+            op_levels = cfg['op_type'].split('.')
+            hardware = op_levels[0]
+            operation = op_levels[1]
+            if hardware == 'mouse':
+                if operation == 'press':
+                    call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
+                    self.do_job(call_func.press, cfg['loop_times'])
+                elif operation == 'move':
+                    call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
+                    self.do_job(call_func.move, cfg['loop_times'])
+            elif hardware == 'keyboard':
+                if operation == 'input':
+                    call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
+                    self.do_job(call_func.operate, cfg['loop_times'])
+                elif operation == 'str':
+                    call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
+                    self.do_job(call_func.sendstr, cfg['loop_times'])
 
     def main(self):
+        # ----------------------------------窗口句柄部分---------------------------------- #
         win32gui.EnumWindows(self.get_hwnd_with_keyword, None)  # 枚举屏幕上所有的顶级窗口，第一个参数为 call_func，第二个没啥用。得到关键字窗口
         hwnds_count = len(self.hwnds_list_of_taegets)
         # 根据符合关键字的窗口数量分别引导用户
@@ -102,6 +104,7 @@ class AFK():
 
         os.system('cls')  # 清空屏幕
 
+        # ----------------------------------配置文件部分---------------------------------- #
         config_list = configs.find('./configs/', '.json')
         if len(config_list):
             for index in range(len(config_list)):
@@ -109,12 +112,19 @@ class AFK():
             cfgs = configs.read(config_list[int(input('请输入要读取的配置序号>>>'))]['path'])
         else:
             print('未发现配置文件，请按提示创建配置文件')
-            cfgs = configs.generate_simple_config()
-        config = cfgs[0]['multi'] if 'class' in cfgs else cfgs[0]['class']
-        loop_times = cfgs[0]['loop_times']
-        for _ in range(loop_times):
-            for cfg in config:
-                self.classify(HWND, cfg)
+            cfgs = configs.generate_config()
+
+        # ----------------------------------分流部分------------------------------------- #
+        for config_per_step in cfgs:
+            # 动作并发
+            if 'multi' in config_per_step.keys():
+                pass
+            # 动作依次执行
+            elif 'class' in config_per_step.keys():
+                step = config_per_step['class']
+                loop_times = config_per_step['loop_times']
+                for _ in range(loop_times):
+                    self.classify(HWND, step)
 
 
 if __name__ == '__main__':

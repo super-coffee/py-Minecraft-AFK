@@ -132,3 +132,4 @@ configs/TEST.json
 *.code-workspace
 .vscode
 configs
+TEST.py

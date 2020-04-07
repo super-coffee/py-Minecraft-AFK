@@ -34,7 +34,7 @@ def pack(operate, during_time, delay_time, loop_times, keys, op_list):
     return op_list
 
 
-def generate_simple_config():
+def generate_config():
     li, final_config = list(), list()
     while True:
         hardware = 'keyboard.' if input('是否为键盘操作，否则为鼠标操作(Y/N)>>>').lower() == 'y' else 'mouse.'

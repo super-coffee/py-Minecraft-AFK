@@ -47,9 +47,11 @@ class AFK():
             print('[{index}] {title}, {hwnd}'.format(index=hwnd_index_id, title=item['title'], hwnd=item['hwnd']))
 
     def do_job(self, callback, loop_times):
+        # ----------------------------------检测alt---------------------------------- #
         if self.run_status:
-            print('>>> 在此窗口按下 ctrl+c 终止运行 <<<')
+            print('>>>  在此窗口按下 ctrl+c 终止运行  <<<')
             print('>>> 在任何地方按下 右alt键 开始操作 <<<')
+            print('>>>在任何窗口按右ctrl暂停，右alt恢复<<<')
             while True:
                 time.sleep(0.001)
                 rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
@@ -58,6 +60,8 @@ class AFK():
                     os.system('cls')
                     print('开始运行')
                     break
+
+        # ----------------------------------运行---------------------------------- #
         if loop_times == -1:
             spinner = Spinner('Running   ')
             count = 0
@@ -85,10 +89,10 @@ class AFK():
                     self.do_job(call_func.move, cfg['loop_times'])
             elif hardware == 'keyboard':
                 if operation == 'input':
-                    call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
+                    call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
                     self.do_job(call_func.operate, cfg['loop_times'])
                 elif operation == 'str':
-                    call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'], False)
+                    call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
                     self.do_job(call_func.sendstr, cfg['loop_times'])
 
     def main(self):
@@ -117,7 +121,11 @@ class AFK():
         if len(config_list):
             for index in range(len(config_list)):
                 print('[%s] %s' % (index, config_list[index]['name']))
-            cfgs = configs.read(config_list[int(input('请输入要读取的配置序号>>>'))]['path'])
+            index = int(input('请输入要读取的配置序号，若为-1则创建新的配置>>>'))
+            if index == -1:
+                cfgs = configs.generate_config()
+            else:
+                cfgs = configs.read(config_list[index]['path'])
         else:
             print('未发现配置文件，请按提示创建配置文件')
             cfgs = configs.generate_config()

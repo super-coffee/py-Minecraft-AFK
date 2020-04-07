@@ -42,10 +42,10 @@ def generate_config():
             operate = 'input' if input('是否为按键操作，否则为发送字符(Y/N)').lower() == 'y' else 'str'
             final_operate = hardware + operate
             if operate == 'input':
-                delay_time = float(input('请输入按键抬起持续时间，若为0，则长按>>>'))
-                during_time = float(input('请输入按键按下时间>>>')) if delay_time else 0
-                keys = input('请输入按键，若输入多个按键则一起按下>>>')
-                loop_times = int(input('请输入重复次数，若为-1，则无限重复>>>')) if delay_time else 0
+                delay_time = float(input('请输入按键抬起持续时间>>>'))
+                during_time = float(input('请输入按键按下时间>>>'))
+                keys = input('请输入按键，若输入多个按键则只按第一个按键>>>')
+                loop_times = int(input('请输入重复次数，若为-1，则无限重复>>>')) if delay_time else -1
                 pack(final_operate, during_time, delay_time, loop_times, keys, li)
             else:
                 delay_time = float(input('输入间隔时间>>>'))
@@ -56,8 +56,8 @@ def generate_config():
             operate = 'press' if input('是否为按键操作，否则为鼠标移动(Y/N)>>>').lower() == 'y' else 'move'
             final_operate = hardware + operate
             if operate == 'press':
-                delay_time = float(input('请输入按键抬起持续时间，若为0，则长按>>>'))
-                during_time = float(input('请输入按键按下时间>>>')) if delay_time else 0
+                delay_time = float(input('请输入按键抬起持续时间>>>'))
+                during_time = float(input('请输入按键按下时间>>>'))
                 keys = int(input('请输入按键 ，0为左键，1为右键，2为中键>>>'))
                 loop_times = int(input('请输入重复次数，若为-1，则无限重复>>>')) if delay_time else 0
                 pack(final_operate, during_time, delay_time, loop_times, keys, li)
@@ -67,7 +67,10 @@ def generate_config():
                 loop_times = int(input('请输入重复次数，若为-1，则无限重复>>>'))
                 pack(final_operate, during_time, 0, loop_times, degree, li)
         if input('是否继续输入(Y/N)>>>').lower() == 'n':
-            method = 'multi' if input('是否并发动作(Y/N)>>>').lower() == 'y' else 'class'
+            if len(li) <= 1:
+                method = 'class'
+            else:
+                method = 'multi' if input('是否并发动作(Y/N)>>>').lower() == 'y' else 'class'
             repeat_times = int(input('请输入总循环次数>>>'))
             final_config = [{
                 method: li,
@@ -87,4 +90,4 @@ def create_Json(Json, path, name):
 
 
 if __name__ == '__main__':
-    print(generate_simple_config())
+    print(generate_config())

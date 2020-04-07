@@ -2,9 +2,12 @@ import math
 import os
 import time
 import win32api
+import win32con
 import win32gui
 
+# 这个文件里面包含了很多咖啡可以添加的调料（大雾
 
+# 伪宏定义
 KD0 = -0b1000000000000000
 KD1 = -0b111111111111111
 KD2 = 0b1
@@ -36,10 +39,21 @@ def get_pos_bin(x, y):
     return (y << 16) | x
 
 
+# 鼠标专用，有空合并
 def do_postmessage(hwnd, during_time, delay_time, key, pos, callback, args):
     win32api.PostMessage(hwnd, key[0], 0, pos)
     nonblocking_delay(during_time, callback, args)
     win32api.PostMessage(hwnd, key[1], 0, pos)
+    nonblocking_delay(delay_time, callback, args)
+
+
+# 键盘专用
+def _do_postmessage(hwnd, VkKeyCode, during_time, delay_time, callback, args):
+    lparamUp = get_lparam(VkKeyCode, True)
+    lparamDown = get_lparam(VkKeyCode, False)
+    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamDown)
+    nonblocking_delay(during_time, callback, args)
+    win32api.PostMessage(hwnd, win32con.WM_KEYUP, VkKeyCode, lparamUp)
     nonblocking_delay(delay_time, callback, args)
 
 
@@ -51,19 +65,21 @@ def get_lparam(wparam, isKeyUp=True):
     return repeatCount | (scanCode << 16) | (0 << 24) | (prevKeyState << 30) | (transitionState << 31)
 
 
+# 暂停用的方法
 def stop(arg):
     key_status = win32api.GetAsyncKeyState(arg[0])
     if key_status == KD1:
         win32api.PostMessage(*arg[2])
-        print("已暂停")
+        print(">>>       已暂停，按alt恢复       <<<")
         while True:
             key_status = win32api.GetAsyncKeyState(arg[1])
             if key_status == KD1:
                 os.system('cls')
-                print("恢复运行")
+                print(">>>           恢复运行           <<<")
                 break
 
 
+# 已经废弃准备大改的鼠标移动方法
 def moving(distance, degree, time_usage=5, step=4):
     mousepos = list(win32api.GetCursorPos())  # 获得mc的基准光标
     deta_X = int(step * math.sin(math.radians(degree)))
@@ -98,5 +114,3 @@ def moving(distance, degree, time_usage=5, step=4):
             end = time.time()
             time_use = end - start
             time.sleep(time_each_repetition - time_use - correct)
-
-

@@ -17,6 +17,14 @@ def default_callback():
     pass
 
 
+def release_key(hwnd, VkKeyCode, is_mouse):
+    if not is_mouse:
+        lparam_up = get_lparam(VkKeyCode)
+        win32api.PostMessage(hwnd, win32con.WM_KEYUP, VkKeyCode, lparam_up)
+    if is_mouse:
+        win32api.PostMessage(hwnd, VkKeyCode, 0, 0)
+
+
 # oh，你要延迟，要不我们喝杯咖啡吧（大雾
 # tips：请勿往里面传要阻塞的函数，否则你会误了正事儿的（大雾
 def nonblocking_delay(delay_time, callback, args):
@@ -41,20 +49,28 @@ def get_pos_bin(x, y):
 
 # 鼠标专用，有空合并
 def do_postmessage(hwnd, during_time, delay_time, key, pos, callback, args):
+    sign = True if delay_time else False
+    delay = 1 if int(delay_time) == 0 else during_time
+    args.append(hwnd), args.append(key[1]), args.append(True)
     win32api.PostMessage(hwnd, key[0], 0, pos)
-    nonblocking_delay(during_time, callback, args)
-    win32api.PostMessage(hwnd, key[1], 0, pos)
-    nonblocking_delay(delay_time, callback, args)
+    nonblocking_delay(delay, callback, args)
+    if sign:
+        win32api.PostMessage(hwnd, key[1], 0, pos)
+        nonblocking_delay(delay_time, callback, args)
 
 
 # 键盘专用
 def _do_postmessage(hwnd, VkKeyCode, during_time, delay_time, callback, args):
+    sign = True if delay_time else False
+    delay = 1 if int(delay_time) == 0 else during_time
     lparamUp = get_lparam(VkKeyCode, True)
     lparamDown = get_lparam(VkKeyCode, False)
+    args.append(hwnd), args.append(VkKeyCode), args.append(False)
     win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, VkKeyCode, lparamDown)
-    nonblocking_delay(during_time, callback, args)
-    win32api.PostMessage(hwnd, win32con.WM_KEYUP, VkKeyCode, lparamUp)
-    nonblocking_delay(delay_time, callback, args)
+    nonblocking_delay(delay, callback, args)
+    if sign:
+        win32api.PostMessage(hwnd, win32con.WM_KEYUP, VkKeyCode, lparamUp)
+        nonblocking_delay(delay_time, callback, args)
 
 
 def get_lparam(wparam, isKeyUp=True):
@@ -70,6 +86,7 @@ def stop(arg):
     key_status = win32api.GetAsyncKeyState(arg[0])
     if key_status == KD1:
         win32api.PostMessage(*arg[2])
+        release_key(arg[3], arg[4], arg[5])
         print(">>>       已暂停，按alt恢复       <<<")
         while True:
             key_status = win32api.GetAsyncKeyState(arg[1])

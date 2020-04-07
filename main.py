@@ -1,7 +1,7 @@
 # coding: UTF-8
 import os
 import time
-
+import threading
 import win32api
 import win32con
 import win32gui
@@ -55,10 +55,18 @@ class AFK():
                 rmenu_status = win32api.GetAsyncKeyState(win32con.VK_RMENU)
                 if rmenu_status == KD0 or rmenu_status == KD1 or rmenu_status == KD2:
                     self.run_status = False
+                    os.system('cls')
+                    print('开始运行')
                     break
         if loop_times == -1:
+            spinner = Spinner('Running   ')
+            count = 0
             while True:
+                count = count + 1
                 callback(callback=stop, args=[win32con.VK_RCONTROL, win32con.VK_RMENU])
+                if count == 20:
+                    spinner.next()
+                    count = 0
         else:
             for _ in tqdm(range(loop_times), ascii=True):
                 callback(callback=stop, args=[win32con.VK_RCONTROL, win32con.VK_RMENU])
@@ -125,6 +133,7 @@ class AFK():
                 loop_times = config_per_step['loop_times']
                 for _ in range(loop_times):
                     self.classify(HWND, step)
+        input('运行完成，按回车退出')
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 import math
+import os
 import time
 import win32api
 import win32gui
@@ -58,6 +59,7 @@ def stop(arg):
         while True:
             key_status = win32api.GetAsyncKeyState(arg[1])
             if key_status == KD1:
+                os.system('cls')
                 print("恢复运行")
                 break
 

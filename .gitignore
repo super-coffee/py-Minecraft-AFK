@@ -133,3 +133,6 @@ configs/TEST.json
 .vscode
 configs
 TEST.py
+MOUSEMOVE/.vs
+MOUSEMOVE/Debug
+MOUSEMOVE/MOUSEMOVE/Debug

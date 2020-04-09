@@ -27,7 +27,8 @@ A win32api-based Minecraft AFK program that can complete mouse / keyboard action
 如果你发现了程序的bug，你可以在 [Issues](https://github.com/jinzhijie/py-Minecraft-AFK/issues/new) 中反馈
 
 ## 已知问题
-- 从 Minecraft 1.13 开始，Mojang 对准心跟随光标机制做出了破坏性的修改，导致鼠标移动完全无法使用，预计修正时间不明。  
+- 从 Minecraft 1.13 开始，Mojang 对准心跟随光标机制做出了破坏性的修改，导致鼠标移动完全无法使用，~~预计修正时间不明。~~
+目前已有方向，预计最迟月底修复。    
 在 Minecraft 1.12.2 及以下，你依然可以使用鼠标移动，但必须保证焦点在 Minecraft 窗口
 
 ## 其他版本

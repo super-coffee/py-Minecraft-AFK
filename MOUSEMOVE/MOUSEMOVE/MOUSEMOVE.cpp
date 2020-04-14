@@ -27,28 +27,16 @@ int main(int argc, char **argv)
 		{
 			SendInput(1, &pos1, sizeof(pos1));
 			count -= 1;
-			if (count == (int)(repeatTimes / 4) * 3)
-			{
-				direction = false;
-			}
+			if (count == (int)(repeatTimes / 4) * 3) direction = false;
 			Sleep(TER);
 		}
 		else
 		{
 			SendInput(1, &pos2, sizeof(pos2));
 			count -= 1;
-			if (count == (int)(repeatTimes / 4))
-			{
-				direction = true;
-			}
+			if (count == (int)(repeatTimes / 4)) direction = true;
 			Sleep(TER);
 		}
 	}
-	//std::cout << distance << std::endl;
-	//std::cout << degree << std::endl;
-	//std::cout << timeUsage << std::endl;
-	//std::cout << step << std::endl;
-	//std::cout << argc << std::endl;
-	//Sleep(5000);
 	return 0;
 }

@@ -6,17 +6,20 @@ from universal_function import do_postmessage
 
 
 class Mouse:
+	# --------------------------------定义一些变量------------------------------------- #
 	hwnd = None
 	keys = None
 	delay_time = None
 	during_time = None
 
+	# --------------------------------初始化传入参数----------------------------------- #
 	def __init__(self, hwnd, keys, delay_time, during_time):
 		self.hwnd = hwnd  # 获取句柄和按键
 		self.keys = keys
 		self.delay_time = delay_time
 		self.during_time = during_time
 
+	# ---------------------------------按键操作--------------------------------------- #
 	def press(self, callback=default_callback, args=None):
 		pos = get_client_center_pos(self.hwnd)
 		if self.keys == 0:
@@ -28,11 +31,10 @@ class Mouse:
 		args.append((self.hwnd, mouse_key[1], 0, pos))
 		do_postmessage(self.hwnd, self.during_time, self.delay_time, mouse_key, pos, callback, args)
 
-	def move(self, sign=False, callback=default_callback, args=None):
-		run_status = sign
-		while run_status:
-			os.popen(f"MOUSEMOVE.exe {self.during_time} {self.delay_time} {self.keys} 5")
-			callback(args)
+	# ---------------------------------移动操作-------------------------------------- #
+	def move(self, callback=default_callback, args=None):
+		os.popen(f"MOUSEMOVE.exe {self.during_time} {self.delay_time} {self.keys} 5")
+		callback(args)
 
 
 if __name__ == '__main__':  # DEBUG

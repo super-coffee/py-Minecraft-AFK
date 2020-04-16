@@ -3,6 +3,7 @@ import json
 import uuid
 
 
+# -------------------------------寻找指定后缀文件------------------------------------ #
 def find(path, suffix):
 	config_list = list()
 	for filename in os.listdir(path):
@@ -16,6 +17,7 @@ def find(path, suffix):
 	return config_list
 
 
+# --------------------------------读取配置文件------------------------------------- #
 def read(file_name):
 	with open(file_name, 'r') as config_file:
 		contents = config_file.read()
@@ -23,6 +25,7 @@ def read(file_name):
 	return config
 
 
+# --------------------------------包装配置文件------------------------------------- #
 def pack(operate, during_time, delay_time, loop_times, keys, op_list):
 	op_list.append({
 		"op_type": operate,
@@ -34,6 +37,7 @@ def pack(operate, during_time, delay_time, loop_times, keys, op_list):
 	return op_list
 
 
+# --------------------------------生成配置文件------------------------------------- #
 def generate_config():
 	li, final_config = list(), list()
 	while True:
@@ -82,6 +86,7 @@ def generate_config():
 	return final_config
 
 
+# --------------------------------保存配置文件------------------------------------- #
 def create_Json(Json, path, name):
 	filepath = path+name
 	with open(filepath, 'w') as config:

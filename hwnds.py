@@ -16,6 +16,7 @@ def get_all_hwnd(hwnd, unused):
 			'hwnd': hwnd  # 句柄 ID
 		})
 
+
 win32gui.EnumWindows(get_all_hwnd, None)
 
 hwnds_count = len(hwnds_list_of_taegets)

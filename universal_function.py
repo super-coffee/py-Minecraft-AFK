@@ -1,9 +1,6 @@
-import math
 import os
 import time
-import win32api
-import win32con
-import win32gui
+import win32api, win32con, win32gui
 
 # 这个文件里面包含了很多咖啡可以添加的调料（大雾
 
@@ -13,10 +10,12 @@ KD1 = -0b111111111111111
 KD2 = 0b1
 
 
+# 没啥用的占位方法
 def default_callback():
 	pass
 
 
+# 释放按键用
 def release_key(hwnd, VkKeyCode, is_mouse):
 	if not is_mouse:
 		lparam_up = get_lparam(VkKeyCode)
@@ -25,6 +24,7 @@ def release_key(hwnd, VkKeyCode, is_mouse):
 		win32api.PostMessage(hwnd, VkKeyCode, 0, 0)
 
 
+# 无阻塞延迟
 # oh，你要延迟，要不我们喝杯咖啡吧（大雾
 # tips：请勿往里面传要阻塞的函数，否则你会误了正事儿的（大雾
 def nonblocking_delay(delay_time, callback, args):
@@ -36,6 +36,7 @@ def nonblocking_delay(delay_time, callback, args):
 			break
 
 
+# 获取窗口中心点
 def get_client_center_pos(hwnd):
 	x1, x2, y1, y2 = win32gui.GetClientRect(hwnd)
 	average_x = round((x1 + y1) / 2)
@@ -43,6 +44,7 @@ def get_client_center_pos(hwnd):
 	return get_pos_bin(average_x, average_y)
 
 
+# 获取坐标点
 def get_pos_bin(x, y):
 	return (y << 16) | x
 
@@ -73,6 +75,7 @@ def _do_postmessage(hwnd, VkKeyCode, during_time, delay_time, callback, args):
 		nonblocking_delay(delay_time, callback, args)
 
 
+# 获取给PostMessage用的参数
 def get_lparam(wparam, isKeyUp=True):
 	scanCode = win32api.MapVirtualKey(wparam, 0)
 	repeatCount = 1 if isKeyUp else 0

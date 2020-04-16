@@ -38,5 +38,6 @@ int main(int argc, char **argv)
 			Sleep(TER);
 		}
 	}
+	std::cout << "Done";
 	return 0;
 }

@@ -1,4 +1,6 @@
 import os
+import time
+
 import win32con
 from universal_function import get_client_center_pos
 from universal_function import default_callback
@@ -34,7 +36,13 @@ class Mouse:
 	# ---------------------------------移动操作-------------------------------------- #
 	def move(self, callback=default_callback, args=None):
 		os.popen(f"MOUSEMOVE.exe {self.during_time} {self.delay_time} {self.keys} 5")
-		callback(args)
+		start = time.time()
+		while True:
+			callback(args)
+			time.sleep(0.01)
+			end = time.time()
+			if end - start >= 5:
+				break
 
 
 if __name__ == '__main__':  # DEBUG

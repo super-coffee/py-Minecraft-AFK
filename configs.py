@@ -66,10 +66,11 @@ def generate_config():
 				loop_times = int(input('请输入重复次数，若为-1，则无限重复>>>')) if delay_time else 0
 				pack(final_operate, during_time, delay_time, loop_times, keys, li)
 			else:
-				during_time = float(input('请输入持续时间，若为零，程序自动设置>>>'))
+				distance = int(input('请输入光标移动距离>>>'))
 				degree = float(input('请输入角度>>>'))
+				delay_time = int(input('请输入持续时间，若为零，程序自动设置>>>'))
 				loop_times = int(input('请输入重复次数，若为-1，则无限重复>>>'))
-				pack(final_operate, during_time, 0, loop_times, degree, li)
+				pack(final_operate, distance, degree, loop_times, delay_time, li)
 		if input('是否继续输入(Y/N)>>>').lower() == 'n':
 			if len(li) <= 1:
 				method = 'class'

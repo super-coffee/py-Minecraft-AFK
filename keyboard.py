@@ -22,7 +22,6 @@ class Keyboard:
 	# ---------------------------------按键操作--------------------------------------- #
 	def operate(self, callback=default_callback, args=None):  # 传入两个参数，是否为回车和是否为按下按键
 		VkKeyCode = win32api.VkKeyScan(self.keys[0])  # 获得按键的虚拟键值
-		args.append((self.hwnd, win32con.WM_KEYUP, VkKeyCode, get_lparam(VkKeyCode, True)))
 		_do_postmessage(self.hwnd, VkKeyCode, self.during_time, self.delay_time, callback, args)
 
 	# ---------------------------------发送字符--------------------------------------- #

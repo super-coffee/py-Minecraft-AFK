@@ -30,11 +30,11 @@ class Mouse:
 			mouse_key = [win32con.WM_RBUTTONDOWN, win32con.WM_RBUTTONUP]
 		else:
 			mouse_key = [win32con.WM_MBUTTONDOWN, win32con.WM_MBUTTONUP]
-		args.append((self.hwnd, mouse_key[1], 0, pos))
 		do_postmessage(self.hwnd, self.during_time, self.delay_time, mouse_key, pos, callback, args)
 
 	# ---------------------------------移动操作-------------------------------------- #
 	def move(self, callback=default_callback, args=None):
+		args.append(0), args.append(0), args.append(True)
 		os.popen(f"MOUSEMOVE.exe {self.during_time} {self.delay_time} {self.keys} 5")
 		start = time.time()
 		while True:

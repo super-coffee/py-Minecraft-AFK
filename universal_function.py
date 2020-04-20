@@ -88,8 +88,7 @@ def get_lparam(wparam, isKeyUp=True):
 def stop(arg):
 	key_status = win32api.GetAsyncKeyState(arg[0])
 	if key_status == KD1:
-		win32api.PostMessage(*arg[2])
-		release_key(arg[3], arg[4], arg[5])
+		release_key(arg[2], arg[3], arg[4])
 		print(">>>       已暂停，按alt恢复       <<<")
 		while True:
 			key_status = win32api.GetAsyncKeyState(arg[1])

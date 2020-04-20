@@ -86,18 +86,16 @@ class AFK():
 			hardware = op_levels[0]
 			operation = op_levels[1]
 			if hardware == 'mouse':
+				call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
 				if operation == 'press':
-					call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
 					self.do_job(call_func.press, cfg['loop_times'])
 				elif operation == 'move':
-					call_func = Mouse(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
 					self.do_job(call_func.move, cfg['loop_times'])
 			elif hardware == 'keyboard':
+				call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
 				if operation == 'input':
-					call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
 					self.do_job(call_func.operate, cfg['loop_times'])
 				elif operation == 'str':
-					call_func = Keyboard(hwnd, cfg['keys'], cfg['up_time'], cfg['down_time'])
 					self.do_job(call_func.sendstr, cfg['loop_times'])
 
 	def main(self):

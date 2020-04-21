@@ -1,3 +1,9 @@
 DEBUG
 requirements.txt
 .github
+configs
+CppCodes/CLIPBOARD/.vs
+CppCodes/MOUSEMOVE/.vs
+PythonCodes/__pycache__
+CppCodes/MOUSEMOVE/Release
+CppCodes/CLIPBOARD/Release

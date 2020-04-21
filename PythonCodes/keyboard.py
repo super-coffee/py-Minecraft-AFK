@@ -30,6 +30,7 @@ class Keyboard:
 	def sendstr(self, callback=default_callback, args=None):
 		args.append(0), args.append(0), args.append(True)
 		os.popen(f"..\\plugins\\CLIPBOARD.exe {self.keys}")
+		start = time.time()
 		while True:
 			callback(args)
 			time.sleep(0.01)

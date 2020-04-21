@@ -1,8 +1,10 @@
 import time
+import os
 import win32api, win32con
 from universal_function import get_lparam
 from universal_function import _do_postmessage
 from universal_function import default_callback
+from universal_function import nonblocking_delay
 
 
 class Keyboard:
@@ -25,12 +27,15 @@ class Keyboard:
 		_do_postmessage(self.hwnd, VkKeyCode, self.during_time, self.delay_time, callback, args)
 
 	# ---------------------------------发送字符--------------------------------------- #
-	# 已废弃，待修改
-	def sendstr(self, is_up=False, callback=default_callback, args=None):
-		for key in self.keys:
-			VkKeyCode = win32api.VkKeyScan(key)
-			win32api.PostMessage(self.hwnd, 0, VkKeyCode, 0)
-			time.sleep(self.delay_time)
+	def sendstr(self, callback=default_callback, args=None):
+		args.append(0), args.append(0), args.append(True)
+		os.popen(f"..\\plugins\\CLIPBOARD.exe {self.keys}")
+		while True:
+			callback(args)
+			time.sleep(0.01)
+			end = time.time()
+			if end - start >= self.delay_time:
+				break
 
 
 if __name__ == "__main__":

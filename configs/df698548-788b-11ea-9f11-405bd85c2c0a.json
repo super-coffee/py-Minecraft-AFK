@@ -1,0 +1,14 @@
+[
+    {
+        "class": [
+            {
+                "op_type": "keyboard.input",
+                "loop_times": -1,
+                "down_time": 0.01,
+                "up_time": 0.0,
+                "keys": "asd"
+            }
+        ],
+        "loop_times": 1
+    }
+]

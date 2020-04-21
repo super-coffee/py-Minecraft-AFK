@@ -120,7 +120,7 @@ class AFK():
 		os.system('cls')  # 清空屏幕
 
 		# ----------------------------------配置文件部分---------------------------------- #
-		config_list = configs.find('./configs/', '.json')
+		config_list = configs.find('../configs/', '.json')
 		if len(config_list):
 			for index in range(len(config_list)):
 				print('[%s] %s' % (index, config_list[index]['name']))

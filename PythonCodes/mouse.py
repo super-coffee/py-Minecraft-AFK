@@ -35,7 +35,7 @@ class Mouse:
 	# ---------------------------------移动操作-------------------------------------- #
 	def move(self, callback=default_callback, args=None):
 		args.append(0), args.append(0), args.append(True)
-		os.popen(f"MOUSEMOVE.exe {self.during_time} {self.delay_time} {self.keys} 5")
+		os.popen(f"..\\plugins\\MOUSEMOVE.exe {self.during_time} {self.delay_time} {self.keys} 5")
 		start = time.time()
 		while True:
 			callback(args)

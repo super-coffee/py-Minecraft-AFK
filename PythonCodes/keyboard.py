@@ -28,9 +28,17 @@ class Keyboard:
 
 	# ---------------------------------发送字符--------------------------------------- #
 	def sendstr(self, callback=default_callback, args=None):
-		args.append(0), args.append(0), args.append(True)
-		os.popen(f"..\\plugins\\CLIPBOARD.exe {self.keys}")
 		start = time.time()
+		os.system(f"..\\plugins\\CLIPBOARD.exe {self.keys}")
+		args.append(0), args.append(0), args.append(True)
+		win32api.keybd_event(0x11, 0, 0, 0)
+		win32api.keybd_event(0x56, 0, 0, 0)
+		time.sleep(0.001)
+		win32api.keybd_event(0x56, 0, win32con.KEYEVENTF_KEYUP, 0)
+		win32api.keybd_event(0x11, 0, win32con.KEYEVENTF_KEYUP, 0)
+		time.sleep(0.001)
+		win32api.keybd_event(win32con.VK_RETURN, 0, 0, 0)
+		win32api.keybd_event(win32con.VK_RETURN, 0, win32con.KEYEVENTF_KEYUP, 0)
 		while True:
 			callback(args)
 			time.sleep(0.01)

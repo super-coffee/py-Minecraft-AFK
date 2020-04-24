@@ -9,8 +9,7 @@ from tqdm import tqdm
 from progress.spinner import Spinner
 # 导入操作相关模块
 import configs
-from keyboard import Keyboard
-from mouse import Mouse
+from hardware import Mouse, Keyboard
 from universal_function import stop, KD0, KD1, KD2
 
 

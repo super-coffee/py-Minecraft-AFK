@@ -82,7 +82,7 @@ def generate_config():
 				'loop_times': repeat_times
 			}]
 			file_name = uuid.uuid1()
-			create_Json(final_config, './configs/', '{filename}.json'.format(filename=file_name))
+			create_Json(final_config, '../configs/', '{filename}.json'.format(filename=file_name))
 			break
 	return final_config
 

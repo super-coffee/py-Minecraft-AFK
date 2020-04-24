@@ -1,20 +1,16 @@
 {
 	"folders": [
 		{
-			"name": "DEBUG",
-			"path": "./DEBUG"
-		},
-		{
 			"name": "PythonCodes",
 			"path": "./PythonCodes"
 		},
 		{
-			"name": "Configs",
-			"path": "./configs"
-		},
-		{
 			"name": "CppCodes",
 			"path": "./CppCodes"
+		},
+		{
+			"name": "DEBUG",
+			"path": "./DEBUG"
 		},
 		{
 			"name": "Configs",

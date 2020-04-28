@@ -3,7 +3,8 @@ import os
 import time
 import threading
 # 导入win32api
-import win32api, win32con, win32gui
+from win32 import win32api, win32gui
+from win32.lib import win32con
 # 导入进度条相关
 from tqdm import tqdm
 from progress.spinner import Spinner

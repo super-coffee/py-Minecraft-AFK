@@ -1,6 +1,7 @@
 import os
 import time
-import win32api, win32con, win32gui
+from win32 import win32api, win32gui
+from win32.lib import win32con
 
 # 这个文件里面包含了很多咖啡可以添加的调料（大雾
 

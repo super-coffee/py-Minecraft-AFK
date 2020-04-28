@@ -1,6 +1,7 @@
 import time
 import os
-import win32api, win32con
+from win32 import win32api
+from win32.lib import win32con
 from universal_function import get_lparam
 from universal_function import _do_postmessage
 from universal_function import do_postmessage
